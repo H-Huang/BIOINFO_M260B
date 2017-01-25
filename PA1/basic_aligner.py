@@ -60,24 +60,27 @@ def trivial_algorithm(paired_end_reads, ref):
                     min_mismatch_location = i
 
             reversed_read = read[::-1]
-            for i in range(len(ref) - 50):
+            for i in range(len(ref) - len(read)):
                 mismatches = [1 if reversed_read[j] != ref[i + j] else 0 for j in range(len(read))]
                 n_mismatches = sum(mismatches)
                 if n_mismatches < min_mismatches:
                     min_mismatches = n_mismatches
                     min_mismatch_location = i
                     read = reversed_read
-            read_alignment_locations.append(min_mismatch_location)
-            output_read_pair.append(read)
+
+            if min_mismatches < 3:
+                read_alignment_locations.append(min_mismatch_location)
+                output_read_pair.append(read)
             # # Note that there are some huge potential problems here.
 
-        all_read_alignment_locations.append(read_alignment_locations)
-        output_read_pairs.append(output_read_pair)
+        if len(read_alignment_locations) == 2 and len(output_read_pair) == 2:
+            all_read_alignment_locations.append(read_alignment_locations)
+            output_read_pairs.append(output_read_pair)
     return all_read_alignment_locations, output_read_pairs
 
 
 if __name__ == "__main__":
-    data_folder = 'practice_W_1'
+    data_folder = 'hw1_W_2'
     input_folder = join('../data/', data_folder)
     f_base = '{}_chr_1'.format(data_folder)
     reads_fn = join(input_folder, 'reads_{}.txt'.format(f_base))
@@ -88,6 +91,7 @@ if __name__ == "__main__":
     #   input_reads = reads[:300]
     #
     # to generate some data quickly.
+    # input_reads = input_reads[]
 
     reference_fn = join(input_folder, 'ref_{}.txt'.format(f_base))
     reference = read_reference(reference_fn)
