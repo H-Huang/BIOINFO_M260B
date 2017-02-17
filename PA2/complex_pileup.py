@@ -127,18 +127,19 @@ def generate_donor(ref, aligned_reads):
         un_donored_reads = []
         for padded_read in padded_reads:
             re_aligned_read, score = align_to_donor(donor_genome, padded_read)
-            if score < 10:  # If the alignment isn't good, throw the read back in the set of reads to be aligned.
+            if score < 50:  # If the alignment isn't good, throw the read back in the set of reads to be aligned.
                 un_donored_reads.append(padded_read)
             else:
                 donor_genome = ''.join([re_aligned_read[i] if donor_genome[i] == ' ' else donor_genome[i]
                                         for i in range(len(donor_genome))])
 
-        if len(un_donored_reads) == len(padded_reads):
-            # If we can't find good alignments for the remaining reads, quit
-            break
-        else:
-            # Otherwise, restart the alignment with a smaller set of unaligned reads
-            padded_reads = un_donored_reads
+        break
+        # if len(un_donored_reads) == len(padded_reads):
+        #     # If we can't find good alignments for the remaining reads, quit
+        #     break
+        # else:
+        #     # Otherwise, restart the alignment with a smaller set of unaligned reads
+        #     padded_reads = un_donored_reads
 
     ## Fill in any gaps with the consensus sequence and return the donor genome.
     donor_genome = ''.join([donor_genome[i] if donor_genome[i] != ' ' else consensus_string[i] for i
@@ -256,6 +257,10 @@ def identify_changes(ref, donor, offset):
         else:
             raise ValueError
     changes = sorted(changes, key=lambda change: change[-1])
+
+    if len(changes) > 4:
+        changes = []
+
     print str(changes)
     return changes
 
@@ -299,24 +304,24 @@ if __name__ == "__main__":
     # identify_changes(ref='TTACCGTGCAAGCG', donor='GCACCCAAGTTCG', offset=0)
     # ### /Testing Code
     #
-    # genome_name = 'hw2undergrad_E_2'
-    # input_folder = './PA2/{}'.format(genome_name)
-    # chr_name = '{}_chr_1'.format(genome_name)
-    # reads_fn_end = 'reads_{}.txt'.format(chr_name)
-    # reads_fn = join(input_folder, reads_fn_end)
-    # ref_fn_end = 'ref_{}.txt'.format(chr_name)
-    # ref_fn = join(input_folder, ref_fn_end)
-    # start = time.clock()
-    # input_fn = join(input_folder, 'aligned_reads_{}.txt'.format(chr_name))
-    # snps, insertions, deletions = generate_pileup(input_fn)
-    # output_fn = join(input_folder, 'changes_{}.txt'.format(chr_name))
-    # with open(output_fn, 'w') as output_file:
-    #     output_file.write('>' + chr_name + '\n>SNP\n')
-    #     for x in snps:
-    #         output_file.write(','.join([str(u) for u in x[1:]]) + '\n')
-    #     output_file.write('>INS\n')
-    #     for x in insertions:
-    #         output_file.write(','.join([str(u) for u in x[1:]]) + '\n')
-    #     output_file.write('>DEL\n')
-    #     for x in deletions:
-    #         output_file.write(','.join([str(u) for u in x[1:]]) + '\n')
+    genome_name = 'hw2undergrad_E_2'
+    input_folder = '../data/{}'.format(genome_name)
+    chr_name = '{}_chr_1'.format(genome_name)
+    reads_fn_end = 'reads_{}.txt'.format(chr_name)
+    reads_fn = join(input_folder, reads_fn_end)
+    ref_fn_end = 'ref_{}.txt'.format(chr_name)
+    ref_fn = join(input_folder, ref_fn_end)
+    start = time.clock()
+    input_fn = join(input_folder, 'aligned_reads_{}.txt'.format(chr_name))
+    snps, insertions, deletions = generate_pileup(input_fn)
+    output_fn = join(input_folder, 'changes_{}.txt'.format(chr_name))
+    with open(output_fn, 'w') as output_file:
+        output_file.write('>' + chr_name + '\n>SNP\n')
+        for x in snps:
+            output_file.write(','.join([str(u) for u in x[1:]]) + '\n')
+        output_file.write('>INS\n')
+        for x in insertions:
+            output_file.write(','.join([str(u) for u in x[1:]]) + '\n')
+        output_file.write('>DEL\n')
+        for x in deletions:
+            output_file.write(','.join([str(u) for u in x[1:]]) + '\n')

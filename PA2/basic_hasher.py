@@ -95,7 +95,10 @@ def build_hash_and_pickle(ref_fn, key_length, force_rebuild=False):
         pass
     reference = read_reference(ref_fn)
     ref_genome_hash = make_genome_hash(reference, key_length)
+    print "##################################################"
+    print ref_genome_hash
     pickle.dump(ref_genome_hash, open(reference_hash_pkl_fn, 'wb'))
+    print "##################################################"
     return ref_genome_hash
 
 
@@ -124,14 +127,14 @@ def hashing_algorithm(paired_end_reads, genome_ht):
     return alignments, genome_aligned_reads
 
 if __name__ == "__main__":
-    genome_name = 'practice_W_1'
-    input_folder = './{}'.format(genome_name)
+    genome_name = 'hw2undergrad_E_2'
+    input_folder = '../data/{}'.format(genome_name)
     chr_name = '{}_chr_1'.format(genome_name)
     reads_fn_end = 'reads_{}.txt'.format(chr_name)
     reads_fn = join(input_folder, reads_fn_end)
     ref_fn_end = 'ref_{}.txt'.format(chr_name)
     ref_fn = join(input_folder, ref_fn_end)
-    key_length = 7
+    key_length = 9
     start = time.clock()
     reads = read_reads(reads_fn)
     # If you want to speed it up, cut down the number of reads by
@@ -143,4 +146,6 @@ if __name__ == "__main__":
     # print genome_aligned_reads
     # print alignments
     output_str = pretty_print_aligned_reads_with_ref(genome_aligned_reads, alignments, ref)
-    print output_str[:5000]
+    output_fn = join(input_folder, 'aligned_reads_{}.txt'.format(chr_name))
+    with(open(output_fn, 'w')) as output_file:
+        output_file.write(output_str)
